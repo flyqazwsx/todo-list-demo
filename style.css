@@ -122,6 +122,10 @@ body {
   gap: 12px;
 }
 
+.todo-filter-field {
+  flex: 0 1 220px;
+}
+
 .todo-list {
   list-style: none;
   margin: 0;

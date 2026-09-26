@@ -49,9 +49,16 @@
         </form>
       </section>
 
-      <!-- 篩選／排序控制列容器（將於後續任務加入） -->
+      <!-- 篩選／排序控制列容器（排序將於後續任務加入） -->
       <section class="todo-controls-section" aria-label="篩選與排序">
-        <div id="todo-controls" class="todo-controls"></div>
+        <div id="todo-controls" class="todo-controls">
+          <div class="form-field todo-filter-field">
+            <label for="todo-category-filter">分類/標籤篩選</label>
+            <select id="todo-category-filter" name="categoryFilter">
+              <option value="">顯示全部</option>
+            </select>
+          </div>
+        </div>
       </section>
 
       <!-- 待辦清單容器 -->

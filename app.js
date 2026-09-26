@@ -24,6 +24,13 @@
   var editingId = null;
 
   /**
+   * 目前的分類/標籤篩選狀態；空字串表示「顯示全部」，不做任何過濾。
+   * 只影響畫面渲染，絕不寫回 storage／localStorage。
+   * @type {string}
+   */
+  var currentCategoryFilter = '';
+
+  /**
    * 將優先順序內部值轉換成顯示用中文標籤。
    * @param {string} priority
    * @returns {string}
@@ -47,6 +54,93 @@
       return !!t.completed;
     });
     return incomplete.concat(completed);
+  }
+
+  /**
+   * 從目前（未過濾）的待辦事項中取出所有出現過的分類/標籤，並去重、排序。
+   * 空白或未填寫分類的項目不會產生選項（其仍可透過「顯示全部」看到）。
+   * @param {Array<Object>} todos
+   * @returns {Array<string>}
+   */
+  function getUniqueCategories(todos) {
+    var list = Array.isArray(todos) ? todos : [];
+    var seen = {};
+    var categories = [];
+
+    list.forEach(function (todo) {
+      var category = ((todo && todo.category) || '').trim();
+      if (category && !seen[category]) {
+        seen[category] = true;
+        categories.push(category);
+      }
+    });
+
+    categories.sort(function (a, b) {
+      return a.localeCompare(b, 'zh-Hant');
+    });
+
+    return categories;
+  }
+
+  /**
+   * 依分類/標籤篩選待辦事項陣列。不修改原陣列，回傳新陣列。
+   * category 為空字串（或未提供）時代表「顯示全部」，不做任何過濾。
+   * @param {Array<Object>} todos
+   * @param {string} category
+   * @returns {Array<Object>}
+   */
+  function filterTodosByCategory(todos, category) {
+    var list = Array.isArray(todos) ? todos : [];
+    if (!category) {
+      return list.slice();
+    }
+    return list.filter(function (todo) {
+      return !!todo && todo.category === category;
+    });
+  }
+
+  /**
+   * 依目前（未過濾的）全部待辦事項重新產生分類/標籤篩選下拉選單的選項，
+   * 並盡量保留使用者目前選擇的篩選值；若目前篩選值已不存在於資料中，
+   * 則重設回「顯示全部」。
+   * @param {Array<Object>} todos
+   */
+  function renderCategoryFilterOptions(todos) {
+    var selectEl = document.getElementById('todo-category-filter');
+    if (!selectEl) {
+      return;
+    }
+
+    var categories = getUniqueCategories(todos);
+
+    if (currentCategoryFilter && categories.indexOf(currentCategoryFilter) === -1) {
+      currentCategoryFilter = '';
+    }
+
+    selectEl.innerHTML = '';
+
+    var allOptionEl = document.createElement('option');
+    allOptionEl.value = '';
+    allOptionEl.textContent = '顯示全部';
+    selectEl.appendChild(allOptionEl);
+
+    categories.forEach(function (category) {
+      var optionEl = document.createElement('option');
+      optionEl.value = category;
+      optionEl.textContent = category;
+      selectEl.appendChild(optionEl);
+    });
+
+    selectEl.value = currentCategoryFilter;
+  }
+
+  /**
+   * 分類/標籤篩選下拉選單的 change 事件處理：更新目前篩選狀態並重繪清單。
+   * @param {Event} event
+   */
+  function handleCategoryFilterChange(event) {
+    currentCategoryFilter = (event.target && event.target.value) || '';
+    refreshTodoList();
   }
 
   /**
@@ -192,10 +286,15 @@
 
   /**
    * 重新從 storage 讀取資料並重繪清單。
+   * 流程：讀取全部資料 → 用全部資料重建篩選選單選項 → 依目前篩選狀態過濾
+   * → 交給 renderTodos（內部會再依完成狀態排序）渲染。
+   * 篩選僅影響畫面顯示，不會寫回 storage／localStorage。
    */
   function refreshTodoList() {
     var todos = window.storage.getTodos();
-    renderTodos(todos);
+    renderCategoryFilterOptions(todos);
+    var filteredTodos = filterTodosByCategory(todos, currentCategoryFilter);
+    renderTodos(filteredTodos);
   }
 
   /**
@@ -359,6 +458,11 @@
     var cancelButtonEl = document.getElementById('todo-form-cancel');
     if (cancelButtonEl) {
       cancelButtonEl.addEventListener('click', handleCancelEdit);
+    }
+
+    var categoryFilterEl = document.getElementById('todo-category-filter');
+    if (categoryFilterEl) {
+      categoryFilterEl.addEventListener('change', handleCategoryFilterChange);
     }
 
     refreshTodoList();
