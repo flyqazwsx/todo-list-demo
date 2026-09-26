@@ -1,7 +1,7 @@
 # Execution Status: todo-list epic
 
 ## Active
-- Issue #9 - 手動驗收與跨瀏覽器檢查
+(none — epic 全部任務已完成)
 
 ## Ready but queued
 (none)
@@ -17,3 +17,6 @@
 - #6 分類/標籤篩選 — closed 2026-09-26T15:42:05Z
 - #7 優先順序排序 — closed 2026-09-26T15:46:41Z
 - #8 到期提醒視覺化 — closed 2026-09-26T15:51:22Z
+- #9 手動驗收與跨瀏覽器檢查 — closed 2026-09-26T16:16:58Z
+
+Epic todo-list：8/8 任務完成（100%）。尚未合併回 main，等待使用者確認後執行「merge the todo-list epic」。
