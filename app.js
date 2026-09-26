@@ -27,14 +27,51 @@
   }
 
   /**
+   * 依完成狀態排序待辦事項：未完成排在前面，已完成排在後面。
+   * 不修改原陣列，回傳新陣列；同一分組內維持原本相對順序（穩定排序）。
+   * @param {Array<Object>} todos
+   * @returns {Array<Object>}
+   */
+  function sortTodosByCompleted(todos) {
+    var list = Array.isArray(todos) ? todos.slice() : [];
+    var incomplete = list.filter(function (t) {
+      return !t.completed;
+    });
+    var completed = list.filter(function (t) {
+      return !!t.completed;
+    });
+    return incomplete.concat(completed);
+  }
+
+  /**
+   * 切換單一待辦事項的完成狀態：寫回 storage 後重新渲染整份清單。
+   * @param {string} id
+   * @param {boolean} completed
+   */
+  function handleToggleCompleted(id, completed) {
+    window.storage.updateTodo(id, { completed: completed });
+    refreshTodoList();
+  }
+
+  /**
    * 建立單一待辦事項的清單項目 DOM。
    * @param {Object} todo
    * @returns {HTMLLIElement}
    */
   function createTodoItemEl(todo) {
     var itemEl = document.createElement('li');
-    itemEl.className = 'todo-list-item';
+    itemEl.className = 'todo-list-item' + (todo.completed ? ' completed' : '');
     itemEl.dataset.id = todo.id;
+
+    var checkboxEl = document.createElement('input');
+    checkboxEl.type = 'checkbox';
+    checkboxEl.className = 'todo-item-checkbox';
+    checkboxEl.checked = !!todo.completed;
+    checkboxEl.setAttribute('aria-label', '標記「' + (todo.title || '(未命名)') + '」為' + (todo.completed ? '未完成' : '完成'));
+    checkboxEl.addEventListener('change', function () {
+      handleToggleCompleted(todo.id, checkboxEl.checked);
+    });
+    itemEl.appendChild(checkboxEl);
 
     var mainEl = document.createElement('div');
     mainEl.className = 'todo-item-main';
@@ -88,7 +125,8 @@
       return;
     }
 
-    todos.forEach(function (todo) {
+    var sortedTodos = sortTodosByCompleted(todos);
+    sortedTodos.forEach(function (todo) {
       listEl.appendChild(createTodoItemEl(todo));
     });
   }
