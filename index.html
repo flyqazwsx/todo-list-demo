@@ -15,8 +15,36 @@
     <main class="app-main">
       <!-- 新增待辦事項表單容器（表單細節於 Issue #3 實作） -->
       <section class="todo-form-section" aria-label="新增待辦事項">
-        <form id="todo-form" class="todo-form">
-          <!-- 表單欄位（標題／分類／優先順序／截止日期）將於 Issue #3 加入 -->
+        <form id="todo-form" class="todo-form" novalidate>
+          <div class="form-field form-field-title">
+            <label for="todo-title">標題 <span class="required">*</span></label>
+            <input type="text" id="todo-title" name="title" placeholder="請輸入待辦事項標題" />
+          </div>
+
+          <div class="form-field">
+            <label for="todo-category">分類/標籤</label>
+            <input type="text" id="todo-category" name="category" placeholder="例如：工作、生活" />
+          </div>
+
+          <div class="form-field">
+            <label for="todo-priority">優先順序</label>
+            <select id="todo-priority" name="priority">
+              <option value="high">高</option>
+              <option value="medium" selected>中</option>
+              <option value="low">低</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="todo-due-date">截止日期</label>
+            <input type="date" id="todo-due-date" name="dueDate" />
+          </div>
+
+          <div class="form-field form-field-submit">
+            <button type="submit">新增待辦事項</button>
+          </div>
+
+          <p id="todo-form-error" class="todo-form-error" role="alert" hidden></p>
         </form>
       </section>
 
