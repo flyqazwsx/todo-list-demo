@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>待辦事項清單</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <h1>待辦事項清單</h1>
+    </header>
+
+    <main class="app-main">
+      <!-- 新增待辦事項表單容器（表單細節於 Issue #3 實作） -->
+      <section class="todo-form-section" aria-label="新增待辦事項">
+        <form id="todo-form" class="todo-form">
+          <!-- 表單欄位（標題／分類／優先順序／截止日期）將於 Issue #3 加入 -->
+        </form>
+      </section>
+
+      <!-- 篩選／排序控制列容器（將於後續任務加入） -->
+      <section class="todo-controls-section" aria-label="篩選與排序">
+        <div id="todo-controls" class="todo-controls"></div>
+      </section>
+
+      <!-- 待辦清單容器 -->
+      <section class="todo-list-section" aria-label="待辦事項清單">
+        <ul id="todo-list" class="todo-list"></ul>
+      </section>
+    </main>
+  </div>
+
+  <script src="storage.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
