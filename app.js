@@ -18,6 +18,12 @@
   };
 
   /**
+   * 目前正在編輯中的待辦事項 id；null 表示表單處於「新增模式」。
+   * @type {string|null}
+   */
+  var editingId = null;
+
+  /**
    * 將優先順序內部值轉換成顯示用中文標籤。
    * @param {string} priority
    * @returns {string}
@@ -51,6 +57,34 @@
   function handleToggleCompleted(id, completed) {
     window.storage.updateTodo(id, { completed: completed });
     refreshTodoList();
+  }
+
+  /**
+   * 點擊「刪除」按鈕：跳出 confirm() 二次確認，確認後刪除並重繪清單；
+   * 若使用者正在編輯此筆項目，同時離開編輯模式。
+   * @param {Object} todo
+   */
+  function handleDeleteClick(todo) {
+    var confirmed = window.confirm('確定要刪除這筆待辦事項嗎？');
+    if (!confirmed) {
+      return;
+    }
+
+    window.storage.deleteTodo(todo.id);
+
+    if (editingId === todo.id) {
+      exitEditMode();
+    }
+
+    refreshTodoList();
+  }
+
+  /**
+   * 點擊「編輯」按鈕：將該筆待辦事項的既有值填入表單，並讓表單進入編輯模式。
+   * @param {Object} todo
+   */
+  function handleEditClick(todo) {
+    enterEditMode(todo);
   }
 
   /**
@@ -101,6 +135,31 @@
 
     mainEl.appendChild(metaEl);
     itemEl.appendChild(mainEl);
+
+    var actionsEl = document.createElement('div');
+    actionsEl.className = 'todo-item-actions';
+
+    var editButtonEl = document.createElement('button');
+    editButtonEl.type = 'button';
+    editButtonEl.className = 'todo-item-edit';
+    editButtonEl.textContent = '編輯';
+    editButtonEl.setAttribute('aria-label', '編輯「' + (todo.title || '(未命名)') + '」');
+    editButtonEl.addEventListener('click', function () {
+      handleEditClick(todo);
+    });
+    actionsEl.appendChild(editButtonEl);
+
+    var deleteButtonEl = document.createElement('button');
+    deleteButtonEl.type = 'button';
+    deleteButtonEl.className = 'todo-item-delete';
+    deleteButtonEl.textContent = '刪除';
+    deleteButtonEl.setAttribute('aria-label', '刪除「' + (todo.title || '(未命名)') + '」');
+    deleteButtonEl.addEventListener('click', function () {
+      handleDeleteClick(todo);
+    });
+    actionsEl.appendChild(deleteButtonEl);
+
+    itemEl.appendChild(actionsEl);
 
     return itemEl;
   }
@@ -165,7 +224,86 @@
   }
 
   /**
-   * 處理表單送出：驗證標題必填，通過後寫入資料、清空表單並重繪清單。
+   * 讓表單進入「編輯模式」：把既有待辦事項的值填入表單欄位，
+   * 記錄目前正在編輯的 id，並把送出按鈕文字改成「更新」、顯示「取消編輯」按鈕。
+   * @param {Object} todo
+   */
+  function enterEditMode(todo) {
+    var form = document.getElementById('todo-form');
+    if (!form) {
+      return;
+    }
+
+    var titleInput = form.elements['title'];
+    var categoryInput = form.elements['category'];
+    var priorityInput = form.elements['priority'];
+    var dueDateInput = form.elements['dueDate'];
+
+    if (titleInput) {
+      titleInput.value = todo.title || '';
+    }
+    if (categoryInput) {
+      categoryInput.value = todo.category || '';
+    }
+    if (priorityInput) {
+      priorityInput.value = todo.priority || 'medium';
+    }
+    if (dueDateInput) {
+      dueDateInput.value = todo.dueDate || '';
+    }
+
+    hideFormError();
+    editingId = todo.id;
+
+    var submitButtonEl = document.getElementById('todo-form-submit');
+    if (submitButtonEl) {
+      submitButtonEl.textContent = '更新';
+    }
+
+    var cancelButtonEl = document.getElementById('todo-form-cancel');
+    if (cancelButtonEl) {
+      cancelButtonEl.hidden = false;
+    }
+
+    if (titleInput) {
+      titleInput.focus();
+    }
+  }
+
+  /**
+   * 讓表單離開「編輯模式」回到新增模式：清空表單、清除編輯狀態、
+   * 把送出按鈕文字改回「新增待辦事項」、隱藏「取消編輯」按鈕。
+   */
+  function exitEditMode() {
+    var form = document.getElementById('todo-form');
+    if (form) {
+      form.reset();
+    }
+
+    hideFormError();
+    editingId = null;
+
+    var submitButtonEl = document.getElementById('todo-form-submit');
+    if (submitButtonEl) {
+      submitButtonEl.textContent = '新增待辦事項';
+    }
+
+    var cancelButtonEl = document.getElementById('todo-form-cancel');
+    if (cancelButtonEl) {
+      cancelButtonEl.hidden = true;
+    }
+  }
+
+  /**
+   * 點擊「取消編輯」按鈕：放棄目前編輯，回到新增模式，不做任何資料異動。
+   */
+  function handleCancelEdit() {
+    exitEditMode();
+  }
+
+  /**
+   * 處理表單送出：驗證標題必填，通過後依目前模式呼叫 addTodo 或 updateTodo，
+   * 寫入資料、清空表單、離開編輯模式並重繪清單。
    * @param {Event} event
    */
   function handleFormSubmit(event) {
@@ -189,15 +327,21 @@
 
     hideFormError();
 
-    window.storage.addTodo({
+    var todoData = {
       title: title,
       category: (categoryInput && categoryInput.value || '').trim(),
       priority: (priorityInput && priorityInput.value) || 'medium',
-      dueDate: (dueDateInput && dueDateInput.value) || null,
-      completed: false
-    });
+      dueDate: (dueDateInput && dueDateInput.value) || null
+    };
 
-    form.reset();
+    if (editingId) {
+      window.storage.updateTodo(editingId, todoData);
+    } else {
+      todoData.completed = false;
+      window.storage.addTodo(todoData);
+    }
+
+    exitEditMode();
     refreshTodoList();
   }
 
@@ -210,6 +354,11 @@
     var formEl = document.getElementById('todo-form');
     if (formEl) {
       formEl.addEventListener('submit', handleFormSubmit);
+    }
+
+    var cancelButtonEl = document.getElementById('todo-form-cancel');
+    if (cancelButtonEl) {
+      cancelButtonEl.addEventListener('click', handleCancelEdit);
     }
 
     refreshTodoList();
