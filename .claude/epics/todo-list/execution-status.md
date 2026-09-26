@@ -1,10 +1,10 @@
 # Execution Status: todo-list epic
 
 ## Active
-(none)
+- Issue #3 - 新增與清單渲染 — Stream A in progress (started 2026-09-26T15:24:25Z)
 
 ## Ready (waiting to be started)
-- #3 新增與清單渲染 — depends_on: [2] (已滿足)
+(none)
 
 ## Blocked
 - #4 完成狀態切換 — depends_on: [2, 3]
