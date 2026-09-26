@@ -214,6 +214,33 @@ body {
   text-decoration: line-through;
 }
 
+/* 已逾期（未完成且截止日期早於目前時間）：紅色系醒目樣式。
+   .completed 一定不會與 .todo-due-overdue 同時出現（getDueStatus 對已完成
+   項目一律回傳 normal），但仍用較高優先序的邊框顏色避免視覺衝突。 */
+.todo-list-item.todo-due-overdue {
+  border-color: #d93025;
+  border-width: 2px;
+  background-color: #fdecea;
+}
+
+.todo-list-item.todo-due-overdue .todo-item-due-date {
+  color: #b3261e;
+  font-weight: 600;
+}
+
+/* 即將到期（未完成且截止日期在目前時間起 24 小時內）：橘/黃色系醒目樣式，
+   與逾期（紅）、已完成（淡化＋刪除線）視覺上明顯可區分。 */
+.todo-list-item.todo-due-soon {
+  border-color: #e8971e;
+  border-width: 2px;
+  background-color: #fff4e0;
+}
+
+.todo-list-item.todo-due-soon .todo-item-due-date {
+  color: #a15c00;
+  font-weight: 600;
+}
+
 .todo-list-empty {
   color: #86868b;
   text-align: center;
