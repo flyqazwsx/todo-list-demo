@@ -2,14 +2,76 @@
  * app.js
  * 應用邏輯入口。
  *
- * 本階段（Issue #2）只需驗證與 storage.js 的串接是否正確：
- * 讀取現有待辦事項並做最簡單的渲染／印出，不實作完整的 CRUD 互動邏輯
- * （新增表單、篩選、排序等留待後續任務實作）。
+ * Issue #3：實作新增待辦事項表單（標題／分類標籤／優先順序／截止日期），
+ * 送出後透過 storage.js 寫入資料，並將目前所有待辦事項渲染成清單。
+ * 清單渲染採「整批重繪」策略：每次資料異動後清空 #todo-list 容器，
+ * 依目前 storage 中的資料重新產生所有項目的 DOM。
  */
 
 (function () {
   'use strict';
 
+  var PRIORITY_LABELS = {
+    high: '高',
+    medium: '中',
+    low: '低'
+  };
+
+  /**
+   * 將優先順序內部值轉換成顯示用中文標籤。
+   * @param {string} priority
+   * @returns {string}
+   */
+  function getPriorityLabel(priority) {
+    return PRIORITY_LABELS[priority] || priority || '未設定';
+  }
+
+  /**
+   * 建立單一待辦事項的清單項目 DOM。
+   * @param {Object} todo
+   * @returns {HTMLLIElement}
+   */
+  function createTodoItemEl(todo) {
+    var itemEl = document.createElement('li');
+    itemEl.className = 'todo-list-item';
+    itemEl.dataset.id = todo.id;
+
+    var mainEl = document.createElement('div');
+    mainEl.className = 'todo-item-main';
+
+    var titleEl = document.createElement('span');
+    titleEl.className = 'todo-item-title';
+    titleEl.textContent = todo.title || '(未命名)';
+    mainEl.appendChild(titleEl);
+
+    var metaEl = document.createElement('div');
+    metaEl.className = 'todo-item-meta';
+
+    var categoryEl = document.createElement('span');
+    categoryEl.className = 'todo-item-category';
+    categoryEl.textContent = todo.category ? '分類：' + todo.category : '分類：未分類';
+    metaEl.appendChild(categoryEl);
+
+    var priorityEl = document.createElement('span');
+    priorityEl.className = 'todo-item-priority todo-item-priority-' + (todo.priority || 'medium');
+    priorityEl.textContent = '優先順序：' + getPriorityLabel(todo.priority);
+    metaEl.appendChild(priorityEl);
+
+    var dueDateEl = document.createElement('span');
+    dueDateEl.className = 'todo-item-due-date';
+    dueDateEl.textContent = '截止日期：' + (todo.dueDate || '無');
+    metaEl.appendChild(dueDateEl);
+
+    mainEl.appendChild(metaEl);
+    itemEl.appendChild(mainEl);
+
+    return itemEl;
+  }
+
+  /**
+   * 整批重繪清單：清空 #todo-list 容器，依傳入的 todos 陣列重新產生 DOM。
+   * @param {Array<Object>} todos
+   */
   function renderTodos(todos) {
     var listEl = document.getElementById('todo-list');
     if (!listEl) {
@@ -27,11 +89,78 @@
     }
 
     todos.forEach(function (todo) {
-      var itemEl = document.createElement('li');
-      itemEl.className = 'todo-list-item';
-      itemEl.textContent = todo.title || '(未命名)';
-      listEl.appendChild(itemEl);
+      listEl.appendChild(createTodoItemEl(todo));
     });
+  }
+
+  /**
+   * 重新從 storage 讀取資料並重繪清單。
+   */
+  function refreshTodoList() {
+    var todos = window.storage.getTodos();
+    renderTodos(todos);
+  }
+
+  /**
+   * 顯示表單錯誤訊息。
+   * @param {string} message
+   */
+  function showFormError(message) {
+    var errorEl = document.getElementById('todo-form-error');
+    if (!errorEl) {
+      return;
+    }
+    errorEl.textContent = message;
+    errorEl.hidden = false;
+  }
+
+  /**
+   * 隱藏表單錯誤訊息。
+   */
+  function hideFormError() {
+    var errorEl = document.getElementById('todo-form-error');
+    if (!errorEl) {
+      return;
+    }
+    errorEl.textContent = '';
+    errorEl.hidden = true;
+  }
+
+  /**
+   * 處理表單送出：驗證標題必填，通過後寫入資料、清空表單並重繪清單。
+   * @param {Event} event
+   */
+  function handleFormSubmit(event) {
+    event.preventDefault();
+
+    var form = event.target;
+    var titleInput = form.elements['title'];
+    var categoryInput = form.elements['category'];
+    var priorityInput = form.elements['priority'];
+    var dueDateInput = form.elements['dueDate'];
+
+    var title = (titleInput && titleInput.value || '').trim();
+
+    if (!title) {
+      showFormError('標題為必填欄位，請輸入標題。');
+      if (titleInput) {
+        titleInput.focus();
+      }
+      return;
+    }
+
+    hideFormError();
+
+    window.storage.addTodo({
+      title: title,
+      category: (categoryInput && categoryInput.value || '').trim(),
+      priority: (priorityInput && priorityInput.value) || 'medium',
+      dueDate: (dueDateInput && dueDateInput.value) || null,
+      completed: false
+    });
+
+    form.reset();
+    refreshTodoList();
   }
 
   function init() {
@@ -40,10 +169,12 @@
       return;
     }
 
-    var todos = window.storage.getTodos();
-    console.log('app.js: 目前共有 ' + todos.length + ' 筆待辦事項', todos);
+    var formEl = document.getElementById('todo-form');
+    if (formEl) {
+      formEl.addEventListener('submit', handleFormSubmit);
+    }
 
-    renderTodos(todos);
+    refreshTodoList();
   }
 
   document.addEventListener('DOMContentLoaded', init);
