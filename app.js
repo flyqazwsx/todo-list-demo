@@ -18,6 +18,15 @@
   };
 
   /**
+   * 優先順序對照表：轉換成可比較的數值，數值越大優先順序越高。
+   */
+  var PRIORITY_ORDER = {
+    high: 3,
+    medium: 2,
+    low: 1
+  };
+
+  /**
    * 目前正在編輯中的待辦事項 id；null 表示表單處於「新增模式」。
    * @type {string|null}
    */
@@ -29,6 +38,13 @@
    * @type {string}
    */
   var currentCategoryFilter = '';
+
+  /**
+   * 目前的排序模式：'default'（依建立時間由舊到新）或 'priority'（依優先順序高→中→低）。
+   * 只影響畫面渲染，絕不寫回 storage／localStorage。
+   * @type {string}
+   */
+  var currentSortMode = 'default';
 
   /**
    * 將優先順序內部值轉換成顯示用中文標籤。
@@ -54,6 +70,54 @@
       return !!t.completed;
     });
     return incomplete.concat(completed);
+  }
+
+  /**
+   * 依目前排序模式排序待辦事項。純函式：不修改傳入的原陣列，回傳新陣列，
+   * 也不會寫回 storage／localStorage，僅影響畫面顯示順序。
+   * - mode === 'priority'：依優先順序高→中→低排序（高=3、中=2、低=1，數值大到小），
+   *   數值相同時維持原本相對順序（穩定排序）。
+   * - mode === 'default'（或其他任何值）：依 createdAt 由舊到新排序（時間序）。
+   * @param {Array<Object>} todos
+   * @param {string} mode 'priority' 或 'default'
+   * @returns {Array<Object>}
+   */
+  function sortTodosByMode(todos, mode) {
+    var list = Array.isArray(todos) ? todos.slice() : [];
+
+    if (mode === 'priority') {
+      return list
+        .map(function (todo, index) {
+          return { todo: todo, index: index };
+        })
+        .sort(function (a, b) {
+          var scoreA = PRIORITY_ORDER[a.todo && a.todo.priority] || 0;
+          var scoreB = PRIORITY_ORDER[b.todo && b.todo.priority] || 0;
+          if (scoreA !== scoreB) {
+            return scoreB - scoreA;
+          }
+          return a.index - b.index;
+        })
+        .map(function (entry) {
+          return entry.todo;
+        });
+    }
+
+    return list
+      .map(function (todo, index) {
+        return { todo: todo, index: index };
+      })
+      .sort(function (a, b) {
+        var timeA = a.todo && a.todo.createdAt ? new Date(a.todo.createdAt).getTime() : 0;
+        var timeB = b.todo && b.todo.createdAt ? new Date(b.todo.createdAt).getTime() : 0;
+        if (timeA !== timeB) {
+          return timeA - timeB;
+        }
+        return a.index - b.index;
+      })
+      .map(function (entry) {
+        return entry.todo;
+      });
   }
 
   /**
@@ -140,6 +204,15 @@
    */
   function handleCategoryFilterChange(event) {
     currentCategoryFilter = (event.target && event.target.value) || '';
+    refreshTodoList();
+  }
+
+  /**
+   * 排序方式下拉選單的 change 事件處理：更新目前排序模式並重繪清單。
+   * @param {Event} event
+   */
+  function handleSortModeChange(event) {
+    currentSortMode = (event.target && event.target.value) || 'default';
     refreshTodoList();
   }
 
@@ -287,14 +360,16 @@
   /**
    * 重新從 storage 讀取資料並重繪清單。
    * 流程：讀取全部資料 → 用全部資料重建篩選選單選項 → 依目前篩選狀態過濾
-   * → 交給 renderTodos（內部會再依完成狀態排序）渲染。
-   * 篩選僅影響畫面顯示，不會寫回 storage／localStorage。
+   * → 依目前排序模式排序（優先順序或建立時間）→ 交給 renderTodos（內部會再
+   * 依完成狀態排序，未完成在前、已完成在後，作為最外層分組）渲染。
+   * 篩選與排序僅影響畫面顯示，不會寫回 storage／localStorage。
    */
   function refreshTodoList() {
     var todos = window.storage.getTodos();
     renderCategoryFilterOptions(todos);
     var filteredTodos = filterTodosByCategory(todos, currentCategoryFilter);
-    renderTodos(filteredTodos);
+    var sortedTodos = sortTodosByMode(filteredTodos, currentSortMode);
+    renderTodos(sortedTodos);
   }
 
   /**
@@ -463,6 +538,12 @@
     var categoryFilterEl = document.getElementById('todo-category-filter');
     if (categoryFilterEl) {
       categoryFilterEl.addEventListener('change', handleCategoryFilterChange);
+    }
+
+    var sortModeEl = document.getElementById('todo-sort-mode');
+    if (sortModeEl) {
+      currentSortMode = sortModeEl.value || 'default';
+      sortModeEl.addEventListener('change', handleSortModeChange);
     }
 
     refreshTodoList();
