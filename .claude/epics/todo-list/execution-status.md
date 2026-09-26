@@ -1,10 +1,9 @@
 # Execution Status: todo-list epic
 
 ## Active
-- Issue #4 - 完成狀態切換 — Stream A in progress
+- Issue #5 - 編輯與刪除 — Stream A in progress
 
-## Ready but queued（依賴已滿足，但與 #4 conflicts_with 同一批檔案，需待 #4 完成後依序啟動）
-- #5 編輯與刪除
+## Ready but queued（依賴已滿足，但與 #5 conflicts_with 同一批檔案，需待 #5 完成後依序啟動）
 - #6 分類/標籤篩選
 - #7 優先順序排序
 - #8 到期提醒視覺化
@@ -15,3 +14,4 @@
 ## Complete
 - #2 專案骨架與資料層 — closed 2026-09-26T15:19:36Z
 - #3 新增與清單渲染 — closed 2026-09-26T15:28:24Z
+- #4 完成狀態切換 — closed 2026-09-26T15:33:34Z

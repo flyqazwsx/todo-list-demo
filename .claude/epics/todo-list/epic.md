@@ -2,8 +2,8 @@
 name: todo-list
 status: in-progress
 created: 2026-09-26T14:26:24Z
-updated: 2026-09-26T15:28:24Z
-progress: 25%
+updated: 2026-09-26T15:33:34Z
+progress: 37%
 prd: .claude/prds/todo-list.md
 github: https://github.com/flyqazwsx/todo-list-demo/issues/1
 ---
@@ -79,7 +79,7 @@ github: https://github.com/flyqazwsx/todo-list-demo/issues/1
 
 - [x] #2 - 專案骨架與資料層 (parallel: true)
 - [x] #3 - 新增與清單渲染 (parallel: false)
-- [ ] #4 - 完成狀態切換 (parallel: false)
+- [x] #4 - 完成狀態切換 (parallel: false)
 - [ ] #5 - 編輯與刪除 (parallel: false)
 - [ ] #6 - 分類/標籤篩選 (parallel: false)
 - [ ] #7 - 優先順序排序 (parallel: false)
