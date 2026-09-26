@@ -2,9 +2,10 @@
 name: todo-list
 status: backlog
 created: 2026-09-26T14:26:24Z
+updated: 2026-09-26T15:04:12Z
 progress: 0%
 prd: .claude/prds/todo-list.md
-github: (will be set on sync)
+github: https://github.com/flyqazwsx/todo-list-demo/issues/1
 ---
 
 # Epic: todo-list
@@ -76,14 +77,14 @@ github: (will be set on sync)
 
 ## Tasks Created
 
-- [ ] 001.md - 專案骨架與資料層 (parallel: true)
-- [ ] 002.md - 新增與清單渲染 (parallel: false)
-- [ ] 003.md - 完成狀態切換 (parallel: false)
-- [ ] 004.md - 編輯與刪除 (parallel: false)
-- [ ] 005.md - 分類/標籤篩選 (parallel: false)
-- [ ] 006.md - 優先順序排序 (parallel: false)
-- [ ] 007.md - 到期提醒視覺化 (parallel: false)
-- [ ] 008.md - 手動驗收與跨瀏覽器檢查 (parallel: false)
+- [ ] #2 - 專案骨架與資料層 (parallel: true)
+- [ ] #3 - 新增與清單渲染 (parallel: false)
+- [ ] #4 - 完成狀態切換 (parallel: false)
+- [ ] #5 - 編輯與刪除 (parallel: false)
+- [ ] #6 - 分類/標籤篩選 (parallel: false)
+- [ ] #7 - 優先順序排序 (parallel: false)
+- [ ] #8 - 到期提醒視覺化 (parallel: false)
+- [ ] #9 - 手動驗收與跨瀏覽器檢查 (parallel: false)
 
 Total tasks: 8
 Parallel tasks: 1
