@@ -255,6 +255,58 @@
   }
 
   /**
+   * 到期狀態計算門檻：24 小時（毫秒）。
+   */
+  var DUE_SOON_THRESHOLD_MS = 24 * 60 * 60 * 1000;
+
+  /**
+   * 純函式：依 todo.completed 與 todo.dueDate、目前時間計算到期狀態。
+   * 不修改傳入的 todo，也不寫回 storage。
+   * - 已完成 → 'normal'（即使截止日期已過，也不套用逾期/即將到期樣式）。
+   * - 沒有設定截止日期 → 'normal'。
+   * - 截止時間早於目前時間 → 'overdue'。
+   * - 截止時間在目前時間起 24 小時內（含邊界，(0, 24h] 皆算即將到期）→ 'dueSoon'。
+   * - 其餘（超過 24 小時之後） → 'normal'。
+   * @param {Object} todo
+   * @returns {'overdue'|'dueSoon'|'normal'}
+   */
+  function getDueStatus(todo) {
+    if (!todo || todo.completed) {
+      return 'normal';
+    }
+
+    if (!todo.dueDate) {
+      return 'normal';
+    }
+
+    var dueTime = new Date(todo.dueDate).getTime();
+    if (isNaN(dueTime)) {
+      return 'normal';
+    }
+
+    var now = new Date().getTime();
+    var diff = dueTime - now;
+
+    if (diff <= 0) {
+      return 'overdue';
+    }
+
+    if (diff <= DUE_SOON_THRESHOLD_MS) {
+      return 'dueSoon';
+    }
+
+    return 'normal';
+  }
+
+  /**
+   * 到期狀態對應的 CSS class 名稱對照表。
+   */
+  var DUE_STATUS_CLASS = {
+    overdue: 'todo-due-overdue',
+    dueSoon: 'todo-due-soon'
+  };
+
+  /**
    * 建立單一待辦事項的清單項目 DOM。
    * @param {Object} todo
    * @returns {HTMLLIElement}
@@ -263,6 +315,11 @@
     var itemEl = document.createElement('li');
     itemEl.className = 'todo-list-item' + (todo.completed ? ' completed' : '');
     itemEl.dataset.id = todo.id;
+
+    var dueStatus = getDueStatus(todo);
+    if (DUE_STATUS_CLASS[dueStatus]) {
+      itemEl.classList.add(DUE_STATUS_CLASS[dueStatus]);
+    }
 
     var checkboxEl = document.createElement('input');
     checkboxEl.type = 'checkbox';
