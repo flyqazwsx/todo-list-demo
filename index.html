@@ -49,13 +49,21 @@
         </form>
       </section>
 
-      <!-- 篩選／排序控制列容器（排序將於後續任務加入） -->
+      <!-- 篩選／排序控制列容器 -->
       <section class="todo-controls-section" aria-label="篩選與排序">
         <div id="todo-controls" class="todo-controls">
           <div class="form-field todo-filter-field">
             <label for="todo-category-filter">分類/標籤篩選</label>
             <select id="todo-category-filter" name="categoryFilter">
               <option value="">顯示全部</option>
+            </select>
+          </div>
+
+          <div class="form-field todo-sort-field">
+            <label for="todo-sort-mode">排序方式</label>
+            <select id="todo-sort-mode" name="sortMode">
+              <option value="default" selected>預設順序（依建立時間）</option>
+              <option value="priority">依優先順序排序</option>
             </select>
           </div>
         </div>

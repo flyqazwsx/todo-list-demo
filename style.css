@@ -122,7 +122,8 @@ body {
   gap: 12px;
 }
 
-.todo-filter-field {
+.todo-filter-field,
+.todo-sort-field {
   flex: 0 1 220px;
 }
 
