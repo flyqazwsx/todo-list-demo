@@ -48,6 +48,60 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+  align-items: flex-end;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 160px;
+}
+
+.form-field label {
+  font-size: 0.85rem;
+  color: #444;
+}
+
+.form-field input,
+.form-field select {
+  padding: 8px 10px;
+  border: 1px solid #d0d0d5;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.form-field-title {
+  flex: 2 1 220px;
+}
+
+.required {
+  color: #d93025;
+}
+
+.form-field-submit {
+  flex: 0 0 auto;
+}
+
+.form-field-submit button {
+  padding: 9px 18px;
+  border: none;
+  border-radius: 6px;
+  background-color: #1d1d1f;
+  color: #ffffff;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.form-field-submit button:hover {
+  background-color: #333336;
+}
+
+.todo-form-error {
+  flex-basis: 100%;
+  margin: 0;
+  color: #d93025;
+  font-size: 0.9rem;
 }
 
 .todo-controls {
@@ -73,6 +127,25 @@ body {
   padding: 10px 12px;
   border: 1px solid #e0e0e0;
   border-radius: 6px;
+}
+
+.todo-item-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.todo-item-title {
+  font-weight: 600;
+}
+
+.todo-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: #6e6e73;
 }
 
 .todo-list-empty {
