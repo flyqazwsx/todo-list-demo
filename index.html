@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>待辦事項清單</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <h1>待辦事項清單</h1>
+    </header>
+
+    <main class="app-main">
+      <!-- 新增待辦事項表單容器（表單細節於 Issue #3 實作） -->
+      <section class="todo-form-section" aria-label="新增待辦事項">
+        <form id="todo-form" class="todo-form" novalidate>
+          <div class="form-field form-field-title">
+            <label for="todo-title">標題 <span class="required">*</span></label>
+            <input type="text" id="todo-title" name="title" placeholder="請輸入待辦事項標題" />
+          </div>
+
+          <div class="form-field">
+            <label for="todo-category">分類/標籤</label>
+            <input type="text" id="todo-category" name="category" placeholder="例如：工作、生活" />
+          </div>
+
+          <div class="form-field">
+            <label for="todo-priority">優先順序</label>
+            <select id="todo-priority" name="priority">
+              <option value="high">高</option>
+              <option value="medium" selected>中</option>
+              <option value="low">低</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="todo-due-date">截止日期</label>
+            <input type="date" id="todo-due-date" name="dueDate" />
+          </div>
+
+          <div class="form-field form-field-submit">
+            <button type="submit" id="todo-form-submit">新增待辦事項</button>
+            <button type="button" id="todo-form-cancel" class="todo-form-cancel" hidden>取消編輯</button>
+          </div>
+
+          <p id="todo-form-error" class="todo-form-error" role="alert" hidden></p>
+        </form>
+      </section>
+
+      <!-- 篩選／排序控制列容器 -->
+      <section class="todo-controls-section" aria-label="篩選與排序">
+        <div id="todo-controls" class="todo-controls">
+          <div class="form-field todo-filter-field">
+            <label for="todo-category-filter">分類/標籤篩選</label>
+            <select id="todo-category-filter" name="categoryFilter">
+              <option value="">顯示全部</option>
+            </select>
+          </div>
+
+          <div class="form-field todo-sort-field">
+            <label for="todo-sort-mode">排序方式</label>
+            <select id="todo-sort-mode" name="sortMode">
+              <option value="default" selected>預設順序（依建立時間）</option>
+              <option value="priority">依優先順序排序</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- 待辦清單容器 -->
+      <section class="todo-list-section" aria-label="待辦事項清單">
+        <ul id="todo-list" class="todo-list"></ul>
+      </section>
+    </main>
+  </div>
+
+  <script src="storage.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

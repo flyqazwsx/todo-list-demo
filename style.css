@@ -1,0 +1,248 @@
+/* style.css
+ * 基本版面樣式。完成/逾期/即將到期等視覺狀態樣式將於後續任務加入。
+ */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, "Segoe UI", "Microsoft JhengHei", Arial, sans-serif;
+  background-color: #f5f5f7;
+  color: #1d1d1f;
+}
+
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.app-header h1 {
+  font-size: 1.75rem;
+  margin: 0;
+}
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.todo-form-section,
+.todo-controls-section,
+.todo-list-section {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.todo-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 160px;
+}
+
+.form-field label {
+  font-size: 0.85rem;
+  color: #444;
+}
+
+.form-field input,
+.form-field select {
+  padding: 8px 10px;
+  border: 1px solid #d0d0d5;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.form-field-title {
+  flex: 2 1 220px;
+}
+
+.required {
+  color: #d93025;
+}
+
+.form-field-submit {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 8px;
+}
+
+.form-field-submit button {
+  padding: 9px 18px;
+  border: none;
+  border-radius: 6px;
+  background-color: #1d1d1f;
+  color: #ffffff;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.form-field-submit button:hover {
+  background-color: #333336;
+}
+
+.todo-form-cancel {
+  background-color: #ffffff !important;
+  color: #1d1d1f !important;
+  border: 1px solid #d0d0d5 !important;
+}
+
+.todo-form-cancel:hover {
+  background-color: #f0f0f2 !important;
+}
+
+.todo-form-error {
+  flex-basis: 100%;
+  margin: 0;
+  color: #d93025;
+  font-size: 0.9rem;
+}
+
+.todo-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.todo-filter-field,
+.todo-sort-field {
+  flex: 0 1 220px;
+}
+
+.todo-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.todo-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+}
+
+.todo-item-checkbox {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.todo-item-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.todo-item-title {
+  font-weight: 600;
+}
+
+.todo-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: #6e6e73;
+}
+
+.todo-item-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.todo-item-actions button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.todo-item-edit {
+  border: 1px solid #d0d0d5;
+  background-color: #ffffff;
+  color: #1d1d1f;
+}
+
+.todo-item-edit:hover {
+  background-color: #f0f0f2;
+}
+
+.todo-item-delete {
+  border: 1px solid #d93025;
+  background-color: #ffffff;
+  color: #d93025;
+}
+
+.todo-item-delete:hover {
+  background-color: #fbeae9;
+}
+
+/* 已完成項目：整體淡化並在標題加上刪除線，作為明顯的視覺區隔。 */
+.todo-list-item.completed {
+  opacity: 0.55;
+}
+
+.todo-list-item.completed .todo-item-title {
+  text-decoration: line-through;
+}
+
+/* 已逾期（未完成且截止日期早於目前時間）：紅色系醒目樣式。
+   .completed 一定不會與 .todo-due-overdue 同時出現（getDueStatus 對已完成
+   項目一律回傳 normal），但仍用較高優先序的邊框顏色避免視覺衝突。 */
+.todo-list-item.todo-due-overdue {
+  border-color: #d93025;
+  border-width: 2px;
+  background-color: #fdecea;
+}
+
+.todo-list-item.todo-due-overdue .todo-item-due-date {
+  color: #b3261e;
+  font-weight: 600;
+}
+
+/* 即將到期（未完成且截止日期在目前時間起 24 小時內）：橘/黃色系醒目樣式，
+   與逾期（紅）、已完成（淡化＋刪除線）視覺上明顯可區分。 */
+.todo-list-item.todo-due-soon {
+  border-color: #e8971e;
+  border-width: 2px;
+  background-color: #fff4e0;
+}
+
+.todo-list-item.todo-due-soon .todo-item-due-date {
+  color: #a15c00;
+  font-weight: 600;
+}
+
+.todo-list-empty {
+  color: #86868b;
+  text-align: center;
+  padding: 12px 0;
+}
