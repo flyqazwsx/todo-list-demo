@@ -129,6 +129,13 @@ body {
   border-radius: 6px;
 }
 
+.todo-item-checkbox {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
 .todo-item-main {
   display: flex;
   flex-direction: column;
@@ -146,6 +153,15 @@ body {
   gap: 12px;
   font-size: 0.85rem;
   color: #6e6e73;
+}
+
+/* 已完成項目：整體淡化並在標題加上刪除線，作為明顯的視覺區隔。 */
+.todo-list-item.completed {
+  opacity: 0.55;
+}
+
+.todo-list-item.completed .todo-item-title {
+  text-decoration: line-through;
 }
 
 .todo-list-empty {
